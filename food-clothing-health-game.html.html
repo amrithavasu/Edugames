@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Little Helper</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --sun:#FFD93D;
+  --sky:#E0F7FA;
+  --green:#69C779;
+  --blue:#4FC3F7;
+  --pink:#FF8FAB;
+  --orange:#FF9A3C;
+  --purple:#B39DDB;
+  --card:#FFFFFF;
+  --text:#2D3748;
+  --muted:#718096;
+}
+
+body{
+  font-family:'Nunito',sans-serif;
+  background: linear-gradient(160deg,#E0F7FA 0%,#FFF9C4 50%,#FCE4EC 100%);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  overflow-x:hidden;
+}
+
+/* floating clouds bg */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse 120px 60px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 70%),
+    radial-gradient(ellipse 80px 40px at 18% 15%, rgba(255,255,255,0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 50px at 75% 8%, rgba(255,255,255,0.6) 0%, transparent 70%),
+    radial-gradient(ellipse 70px 35px at 82% 8%, rgba(255,255,255,0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 90px 45px at 45% 90%, rgba(255,255,255,0.4) 0%, transparent 70%);
+  pointer-events:none;
+  z-index:0;
+}
+
+#wrap{
+  position:relative;
+  z-index:1;
+  max-width:640px;
+  width:100%;
+  background:rgba(255,255,255,0.92);
+  border-radius:32px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08);
+  overflow:hidden;
+  backdrop-filter:blur(10px);
+}
+
+/* header strip */
+.header-strip{
+  background:linear-gradient(90deg,#4FC3F7,#B39DDB);
+  padding:18px 24px 14px;
+  text-align:center;
+}
+
+.header-strip h1{
+  font-family:'Fredoka One',cursive;
+  font-size:32px;
+  color:#fff;
+  letter-spacing:1px;
+  text-shadow:0 2px 6px rgba(0,0,0,0.15);
+}
+
+.header-strip p.tagline{
+  font-size:14px;
+  color:rgba(255,255,255,0.9);
+  margin-top:2px;
+}
+
+.main-body{
+  padding:24px 28px 28px;
+}
+
+/* ── START SCREEN ── */
+#start-screen{text-align:center;padding:8px 0 8px}
+
+.characters{font-size:64px;margin:12px 0;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+#start-screen h2{
+  font-family:'Fredoka One',cursive;
+  font-size:24px;
+  color:var(--text);
+  margin-bottom:8px;
+}
+
+#start-screen p{
+  font-size:15px;
+  color:var(--muted);
+  margin-bottom:24px;
+  line-height:1.6;
+}
+
+.topics{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:8px;
+  margin-bottom:24px;
+}
+
+.topic-pill{
+  background:linear-gradient(135deg,#E0F7FA,#B2EBF2);
+  border:1.5px solid #80DEEA;
+  border-radius:99px;
+  padding:6px 14px;
+  font-size:13px;
+  font-weight:700;
+  color:#00838F;
+}
+
+/* ── BUTTONS ── */
+.btn-start{
+  display:inline-block;
+  background:linear-gradient(135deg,#69C779,#43A047);
+  color:#fff;
+  border:none;
+  padding:16px 40px;
+  font-family:'Fredoka One',cursive;
+  font-size:22px;
+  border-radius:99px;
+  cursor:pointer;
+  box-shadow:0 6px 20px rgba(67,160,71,0.4);
+  transition:transform 0.15s,box-shadow 0.15s;
+  letter-spacing:0.5px;
+}
+
+.btn-start:hover{transform:scale(1.05);box-shadow:0 8px 28px rgba(67,160,71,0.5)}
+.btn-start:active{transform:scale(0.97)}
+
+.btn-small{
+  display:inline-block;
+  background:#F1F5F9;
+  color:var(--muted);
+  border:1.5px solid #E2E8F0;
+  padding:9px 22px;
+  font-family:'Nunito',sans-serif;
+  font-weight:700;
+  font-size:14px;
+  border-radius:99px;
+  cursor:pointer;
+  transition:all 0.15s;
+  margin-top:12px;
+}
+
+.btn-small:hover{background:#E2E8F0;color:var(--text)}
+
+/* ── GAME SCREEN ── */
+#game{display:none}
+
+.status-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+  gap:8px;
+}
+
+.progress-text{
+  font-size:13px;
+  font-weight:700;
+  color:var(--muted);
+}
+
+.score-badge{
+  background:linear-gradient(135deg,#FFD93D,#FF9A3C);
+  color:#7B3F00;
+  font-family:'Fredoka One',cursive;
+  font-size:18px;
+  padding:5px 16px;
+  border-radius:99px;
+  box-shadow:0 3px 10px rgba(255,154,60,0.35);
+}
+
+.timer-wrap{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.timer-icon{font-size:16px}
+
+#timer{
+  font-family:'Fredoka One',cursive;
+  font-size:22px;
+  color:var(--text);
+  min-width:28px;
+  text-align:center;
+  transition:color 0.3s;
+}
+
+#timer.warn{color:#FF9A3C}
+#timer.danger{color:#E53E3E;animation:pulse 0.5s infinite alternate}
+@keyframes pulse{to{transform:scale(1.15)}}
+
+/* progress bar */
+.prog-bar-wrap{
+  height:8px;
+  background:#E2E8F0;
+  border-radius:99px;
+  margin-bottom:20px;
+  overflow:hidden;
+}
+
+.prog-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,#4FC3F7,#B39DDB);
+  border-radius:99px;
+  transition:width 0.5s ease;
+}
+
+/* question card */
+.q-card{
+  background:linear-gradient(135deg,#F0F9FF,#EDE7F6);
+  border:2px solid #B3E5FC;
+  border-radius:20px;
+  padding:20px 22px;
+  margin-bottom:18px;
+  min-height:90px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#question{
+  font-family:'Fredoka One',cursive;
+  font-size:22px;
+  color:#1A237E;
+  text-align:center;
+  line-height:1.4;
+}
+
+/* options */
+.options{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:16px;
+}
+
+button.option{
+  background:#fff;
+  border:2.5px solid #E2E8F0;
+  padding:14px 10px;
+  border-radius:16px;
+  font-family:'Nunito',sans-serif;
+  font-size:17px;
+  font-weight:800;
+  color:var(--text);
+  cursor:pointer;
+  transition:transform 0.15s, border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  position:relative;
+  overflow:hidden;
+}
+
+button.option .opt-emoji{font-size:32px;line-height:1}
+
+button.option:not(:disabled):hover{
+  border-color:#4FC3F7;
+  background:#F0F9FF;
+  transform:translateY(-3px);
+  box-shadow:0 6px 18px rgba(79,195,247,0.25);
+}
+
+button.option:not(:disabled):active{transform:scale(0.97)}
+
+button.option.correct{
+  background:linear-gradient(135deg,#E8F5E9,#C8E6C9);
+  border-color:#43A047;
+  color:#1B5E20;
+  transform:scale(1.04);
+  box-shadow:0 6px 20px rgba(67,160,71,0.3);
+}
+
+button.option.incorrect{
+  background:linear-gradient(135deg,#FFEBEE,#FFCDD2);
+  border-color:#E53E3E;
+  color:#7F0000;
+}
+
+button.option .key-hint{
+  position:absolute;
+  top:6px;
+  right:8px;
+  font-size:10px;
+  font-weight:700;
+  color:#CBD5E0;
+  font-family:'Nunito',sans-serif;
+}
+
+/* message */
+#message{
+  min-height:44px;
+  border-radius:14px;
+  padding:10px 16px;
+  font-size:16px;
+  font-weight:700;
+  text-align:center;
+  transition:all 0.3s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+#message.correct-msg{
+  background:#E8F5E9;
+  color:#2E7D32;
+  border:1.5px solid #A5D6A7;
+}
+
+#message.incorrect-msg{
+  background:#FFF3E0;
+  color:#E65100;
+  border:1.5px solid #FFB74D;
+}
+
+#message.empty{background:transparent;border:none}
+
+/* ── END SCREEN ── */
+#end-screen{display:none;text-align:center;padding:8px 0}
+
+.trophy{font-size:80px;animation:spin 1s ease forwards}
+@keyframes spin{0%{transform:rotate(-20deg) scale(0.5);opacity:0}100%{transform:rotate(0) scale(1);opacity:1}}
+
+#end-screen h2{
+  font-family:'Fredoka One',cursive;
+  font-size:30px;
+  color:var(--text);
+  margin:12px 0 6px;
+}
+
+.final-score{
+  font-family:'Fredoka One',cursive;
+  font-size:48px;
+  background:linear-gradient(135deg,#FF9A3C,#FFD93D);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin:8px 0;
+}
+
+.end-msg{
+  font-size:16px;
+  color:var(--muted);
+  margin-bottom:20px;
+  line-height:1.6;
+}
+
+.stars-row{font-size:32px;margin:8px 0}
+
+/* confetti canvas */
+#confetti-canvas{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  pointer-events:none;
+  z-index:999;
+}
+
+/* music button */
+.music-btn{
+  position:fixed;
+  bottom:16px;right:16px;
+  width:44px;height:44px;
+  background:rgba(255,255,255,0.9);
+  border:1.5px solid #E2E8F0;
+  border-radius:50%;
+  font-size:20px;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,0.12);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform 0.15s;
+  z-index:100;
+}
+
+.music-btn:hover{transform:scale(1.1)}
+
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div id="wrap">
+
+  <div class="header-strip">
+    <h1>🌟 My Little Helper</h1>
+    <p class="tagline">Help Mina & Raju make great choices!</p>
+  </div>
+
+  <div class="main-body">
+
+    <!-- START -->
+    <div id="start-screen">
+      <div class="characters">🧒🏽👧🏽</div>
+      <h2>Ready to play?</h2>
+
+      <button class="btn-start" onclick="startGame()">▶ Start Game!</button>
+    </div>
+
+    <!-- GAME -->
+    <div id="game">
+
+      <div class="status-bar">
+        <span class="progress-text" id="progress">Question 1 of 15</span>
+        <span class="score-badge">⭐ <span id="score">0</span></span>
+        <div class="timer-wrap">
+          <span class="timer-icon">⏱</span>
+          <span id="timer">20</span>
+        </div>
+      </div>
+
+      <div class="prog-bar-wrap">
+        <div class="prog-bar-fill" id="prog-fill" style="width:0%"></div>
+      </div>
+
+      <div class="q-card">
+        <div id="question"></div>
+      </div>
+
+      <div id="options" class="options"></div>
+
+      <div id="message" class="empty"></div>
+
+      <div style="text-align:center">
+        <button class="btn-small" onclick="restartGame()">🔄 Restart</button>
+      </div>
+
+    </div>
+
+    <!-- END -->
+    <div id="end-screen">
+      <div class="trophy" id="trophy-icon">🏆</div>
+      <h2 id="end-title">Amazing work!</h2>
+      <div class="final-score" id="finalScore"></div>
+      <div class="stars-row" id="starsRow"></div>
+      <p class="end-msg" id="end-msg"></p>
+      <button class="btn-start" onclick="restartGame()" style="font-size:18px;padding:14px 34px">🔄 Play Again!</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- mute button -->
+<button class="music-btn" id="musicBtn" onclick="toggleMusic()" title="Toggle music">🎵</button>
+
+<script>
+/* ── QUESTIONS ── */
+const QUESTIONS=[
+  {q:"Mina is hungry. What should she eat?",      e:["🍎","🍬"], o:["Fruits","Candy"],      a:"Fruits"},
+  {q:"Raju is thirsty. What should he drink?",    e:["💧","🥤"], o:["Water","Soda"],        a:"Water"},
+  {q:"What keeps our teeth clean and healthy?",   e:["🪥","😴"], o:["Brushing","Sleeping"], a:"Brushing"},
+  {q:"Which one is a fruit?",                     e:["🍎","👕"], o:["Apple","Shirt"],        a:"Apple"},
+  {q:"Which one is a vegetable?",                 e:["🥕","⚽"], o:["Carrot","Ball"],        a:"Carrot"},
+  {q:"It is raining outside. What should they wear?", e:["🌧️","🕶️"], o:["Raincoat","Sunglasses"], a:"Raincoat"},
+  {q:"It is very cold outside. What should they wear?", e:["🧥","👡"], o:["Sweater","Sandals"], a:"Sweater"},
+  {q:"What helps us see when it is dark?",        e:["💡","🛏️"], o:["Torch","Pillow"],      a:"Torch"},
+  {q:"Which food gives us energy to play?",       e:["🍞","🪀"], o:["Bread","Toy"],          a:"Bread"},
+  {q:"What do we use to eat soup?",               e:["🥄","🍴"], o:["Spoon","Fork"],         a:"Spoon"},
+  {q:"What do we wash before eating food?",       e:["🙌","👟"], o:["Hands","Shoes"],        a:"Hands"},
+  {q:"Which drink makes our bones strong?",       e:["🥛","🥤"], o:["Milk","Soda"],          a:"Milk"},
+  {q:"What do we wear to go to school?",          e:["👔","🩲"], o:["Uniform","Pyjamas"],    a:"Uniform"},
+  {q:"What do we wear on our feet outside?",      e:["👟","🎩"], o:["Shoes","Hats"],         a:"Shoes"},
+  {q:"Which is the right thing to do if you get hurt?", e:["🏥","🎮"], o:["Tell an adult","Keep playing"], a:"Tell an adult"},
+];
+
+/* ── MESSAGES ── */
+const CORRECT_MSGS=[
+  "🎉 Fantastic! You're so smart!",
+  "⭐ Great job! Keep it up!",
+  "🌟 You're doing amazing!",
+  "🥳 Correct! You're a star!",
+  "🎊 Brilliant! That's right!",
+  "💪 Excellent! You got it!",
+  "🏆 Superstar! Well done!",
+  "😄 Perfect! You're on fire!",
+];
+
+const WRONG_MSGS=[
+  "💛 Good try! Keep going!",
+  "🌈 Almost! You'll get it next time!",
+  "💪 Don't worry, you're learning!",
+  "😊 It's okay! Every mistake helps us grow!",
+  "🤗 Nice try! Let's keep going!",
+  "💫 You're doing great overall! Keep trying!",
+];
+
+const END_MSGS={
+  great:"You answered everything perfectly! You are a true champion! 🏆",
+  good:"Excellent effort! Mina and Raju are so proud of you! 🌟",
+  okay:"Good job! Keep practising and you'll be a superstar soon! 💪",
+  low:"Don't give up! Every time you play, you learn more! 🌈",
+};
+
+/* ── STATE ── */
+let index=0, score=0, timer=0, timerInterval=null, musicOn=true;
+let shuffled=[];
+
+/* ── AUDIO via Web Audio API ── */
+const AC=new (window.AudioContext||window.webkitAudioContext)();
+
+function playTone(freq,type,duration,vol=0.15){
+  try{
+    const osc=AC.createOscillator();
+    const gain=AC.createGain();
+    osc.connect(gain);gain.connect(AC.destination);
+    osc.type=type;osc.frequency.setValueAtTime(freq,AC.currentTime);
+    gain.gain.setValueAtTime(vol,AC.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+duration);
+    osc.start();osc.stop(AC.currentTime+duration);
+  }catch(e){}
+}
+
+function playCorrect(){
+  playTone(523,  'sine', 0.12, 0.18);
+  setTimeout(()=>playTone(659,'sine',0.12,0.18),120);
+  setTimeout(()=>playTone(784,'sine',0.25,0.18),240);
+}
+
+function playWrong(){
+  playTone(300,'sawtooth',0.3,0.12);
+  setTimeout(()=>playTone(250,'sawtooth',0.3,0.12),180);
+}
+
+function playTick(){
+  playTone(880,'square',0.06,0.05);
+}
+
+/* ── SOFT BGM with Web Audio API ── */
+let bgmInterval=null, bgmGain=null, bgmRunning=false;
+
+const MELODY=[392,440,494,523,494,440,392,349,392,440,392,349,330,349,392,440];
+let melodyIdx=0;
+
+function startBGM(){
+  if(bgmRunning)return;
+  bgmRunning=true;
+  bgmGain=AC.createGain();
+  bgmGain.gain.value=0.06;
+  bgmGain.connect(AC.destination);
+
+  function playNote(){
+    if(!bgmRunning)return;
+    const freq=MELODY[melodyIdx%MELODY.length];
+    melodyIdx++;
+    const osc=AC.createOscillator();
+    const g=AC.createGain();
+    osc.connect(g);g.connect(bgmGain);
+    osc.type='sine';
+    osc.frequency.value=freq;
+    g.gain.setValueAtTime(0.001,AC.currentTime);
+    g.gain.linearRampToValueAtTime(1,AC.currentTime+0.05);
+    g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+0.45);
+    osc.start();osc.stop(AC.currentTime+0.5);
+  }
+
+  playNote();
+  bgmInterval=setInterval(playNote,520);
+}
+
+function stopBGM(){
+  bgmRunning=false;
+  if(bgmInterval){clearInterval(bgmInterval);bgmInterval=null;}
+  if(bgmGain){try{bgmGain.gain.linearRampToValueAtTime(0.001,AC.currentTime+0.3);}catch(e){}}
+}
+
+function toggleMusic(){
+  musicOn=!musicOn;
+  document.getElementById('musicBtn').textContent=musicOn?'🎵':'🔇';
+  if(musicOn){AC.resume();startBGM();}
+  else stopBGM();
+}
+
+/* ── CONFETTI ── */
+const canvas=document.getElementById('confetti-canvas');
+const ctx=canvas.getContext('2d');
+let confettiPieces=[];
+let animFrame=null;
+
+function launchConfetti(count=120){
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  confettiPieces=[];
+  for(let i=0;i<count;i++){
+    confettiPieces.push({
+      x:Math.random()*canvas.width,
+      y:-20-Math.random()*200,
+      w:8+Math.random()*10,
+      h:5+Math.random()*8,
+      color:`hsl(${Math.random()*360},90%,60%)`,
+      rot:Math.random()*360,
+      rotSpeed:(Math.random()-0.5)*8,
+      vx:(Math.random()-0.5)*4,
+      vy:3+Math.random()*4,
+      alpha:1,
+    });
+  }
+  if(animFrame)cancelAnimationFrame(animFrame);
+  drawConfetti();
+}
+
+function drawConfetti(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  let alive=false;
+  confettiPieces.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.rot+=p.rotSpeed;
+    if(p.y>canvas.height*0.6)p.alpha-=0.015;
+    if(p.alpha>0){alive=true;}
+    ctx.save();
+    ctx.globalAlpha=Math.max(0,p.alpha);
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.rot*Math.PI/180);
+    ctx.fillStyle=p.color;
+    ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+    ctx.restore();
+  });
+  if(alive)animFrame=requestAnimationFrame(drawConfetti);
+  else ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+
+/* mini confetti for correct answer */
+function miniConfetti(){
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  const wrap=document.getElementById('wrap').getBoundingClientRect();
+  const cx=wrap.left+wrap.width/2;
+  const cy=wrap.top+100;
+  for(let i=0;i<40;i++){
+    confettiPieces.push({
+      x:cx+(Math.random()-0.5)*80,
+      y:cy,
+      w:6+Math.random()*6,h:4+Math.random()*5,
+      color:`hsl(${Math.random()*360},90%,60%)`,
+      rot:Math.random()*360,rotSpeed:(Math.random()-0.5)*10,
+      vx:(Math.random()-0.5)*6,vy:-4-Math.random()*4,
+      alpha:1,
+    });
+  }
+  confettiPieces.forEach(p=>p.vy+=0.2);
+  if(animFrame)cancelAnimationFrame(animFrame);
+  drawMini();
+}
+
+function drawMini(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  let alive=false;
+  confettiPieces.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.vy+=0.25;p.rot+=p.rotSpeed;p.alpha-=0.02;
+    if(p.alpha>0)alive=true;
+    ctx.save();ctx.globalAlpha=Math.max(0,p.alpha);
+    ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+    ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+    ctx.restore();
+  });
+  if(alive)animFrame=requestAnimationFrame(drawMini);
+  else ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+
+/* ── GAME LOGIC ── */
+function startGame(){
+  if(AC.state==='suspended')AC.resume();
+  shuffled=[...QUESTIONS].sort(()=>Math.random()-0.5);
+  index=0;score=0;
+  document.getElementById('start-screen').style.display='none';
+  document.getElementById('game').style.display='block';
+  document.getElementById('score').textContent='0';
+  startBGM();
+  loadQuestion();
+}
+
+function loadQuestion(){
+  clearInterval(timerInterval);
+  timer=20;
+
+  const t=document.getElementById('timer');
+  t.textContent=timer;
+  t.className='';
+
+  document.getElementById('prog-fill').style.width=(index/shuffled.length*100)+'%';
+  document.getElementById('progress').textContent='Question '+(index+1)+' of '+shuffled.length;
+
+  const q=shuffled[index];
+  document.getElementById('question').textContent=q.q;
+
+  const opts=document.getElementById('options');
+  opts.innerHTML='';
+
+  q.o.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='option';
+    btn.innerHTML=`<span class="opt-emoji">${q.e[i]}</span>${opt}`;
+    btn.onclick=()=>checkAnswer(btn,opt,q.a);
+    opts.appendChild(btn);
+  });
+
+  setMessage('','empty');
+
+  timerInterval=setInterval(updateTimer,1000);
+}
+
+function updateTimer(){
+  timer--;
+  const t=document.getElementById('timer');
+  t.textContent=timer;
+  t.className='';
+  if(timer<=10)t.className='warn';
+  if(timer<=5){t.className='danger';playTick();}
+  if(timer<=0){
+    clearInterval(timerInterval);
+    setMessage("⏰ Time's up! Let's try the next one!","incorrect-msg");
+    disableOptions();
+    setTimeout(nextQuestion,1800);
+  }
+}
+
+function checkAnswer(btn,choice,correct){
+  clearInterval(timerInterval);
+  disableOptions();
+
+  if(choice===correct){
+    btn.classList.add('correct');
+    score++;
+    document.getElementById('score').textContent=score;
+    playCorrect();
+    setMessage(getRandom(CORRECT_MSGS),'correct-msg');
+    miniConfetti();
+  }else{
+    btn.classList.add('incorrect');
+    document.querySelectorAll('.option').forEach(b=>{
+      if(b.textContent.includes(correct))b.classList.add('correct');
+    });
+    playWrong();
+    setMessage(getRandom(WRONG_MSGS),'incorrect-msg');
+  }
+
+  setTimeout(nextQuestion,1900);
+}
+
+function nextQuestion(){
+  index++;
+  if(index<shuffled.length)loadQuestion();
+  else endGame();
+}
+
+function endGame(){
+  clearInterval(timerInterval);
+  stopBGM();
+  document.getElementById('game').style.display='none';
+  document.getElementById('end-screen').style.display='block';
+
+  const pct=score/shuffled.length;
+  let stars='',title='',msgKey='';
+
+  if(pct===1){stars='⭐⭐⭐';title='Perfect Score! 🎉';msgKey='great';}
+  else if(pct>=0.7){stars='⭐⭐✨';title='Wonderful Job! 🌟';msgKey='good';}
+  else if(pct>=0.5){stars='⭐✨';title='Good Effort! 💪';msgKey='okay';}
+  else{stars='✨';title='Keep Practising! 🌈';msgKey='low';}
+
+  document.getElementById('trophy-icon').textContent=pct>=0.7?'🏆':'🎖️';
+  document.getElementById('end-title').textContent=title;
+  document.getElementById('finalScore').textContent=score+' / '+shuffled.length;
+  document.getElementById('starsRow').textContent=stars;
+  document.getElementById('end-msg').textContent=END_MSGS[msgKey];
+
+  launchConfetti(pct>=0.7?160:80);
+
+  // victory BGM
+  if(musicOn){
+    setTimeout(()=>{
+      [523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,'sine',0.4,0.2),i*180));
+    },400);
+  }
+}
+
+function disableOptions(){
+  document.querySelectorAll('.option').forEach(b=>b.disabled=true);
+}
+
+function setMessage(msg,cls){
+  const m=document.getElementById('message');
+  m.textContent=msg;
+  m.className=cls;
+}
+
+function getRandom(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+function restartGame(){location.reload();}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='1')document.querySelectorAll('.option')[0]?.click();
+  if(e.key==='2')document.querySelectorAll('.option')[1]?.click();
+});
+</script>
+</body>
+</html>
